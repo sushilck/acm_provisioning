@@ -1,0 +1,108 @@
+<?php
+/**
+ * Implementation of hook_install().
+ */
+function client_account_install() {
+	drupal_install_schema('client_account');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function client_account_uninstall() {
+	drupal_uninstall_schema('client_account');
+}
+
+function client_account_schema() {
+	$schema['client_account'] = array(
+	'description' => t('The base table for client account'),
+		'fields' => array(
+				'id' => array(
+					'type' => 'serial',
+					'unsigned' => TRUE,
+					'not null' => TRUE,
+				),
+				'username' => array(
+					'type' => 'varchar',
+					'description' => 'client username',
+					'length' => '45',
+					'not null' => TRUE,
+					'default' => '',
+				),
+				'password' => array(
+					'type' => 'varchar',
+					'description' => 'client password',
+					'length' => '45',
+					'default' => '',
+				),
+				'client_secret' => array(
+					'type' => 'varchar',
+					'length' => '45',
+					'default' => '',
+				),
+				'client_id' => array(
+					'type' => 'varchar',
+					'length' => '45',
+					'not null' => FALSE,
+					'default' => '',
+				),
+				'access_token' => array(
+					'type' => 'varchar',
+					'length' => '45',
+					'not null' => FALSE,
+					'default' => '',
+				),
+				'refresh_token' => array(
+					'type' => 'varchar',
+					'length' => '45',
+					'not null' => FALSE,
+					'default' => '',
+				),
+				'activated' => array(
+					'type' => 'varchar',
+					'length' => '10',
+					'not null' => FALSE,
+					'default' => '',
+				),
+			),
+			'primary key' => array('id'),
+		);
+		
+	$schema['client_account_role'] = array(
+		'description' => t('This table for add client role'),
+			'fields' => array(
+				'id' => array(
+					'type' => 'serial',
+					'unsigned' => TRUE,
+					'not null' => TRUE,
+				),
+				'username' => array(
+					'type' => 'varchar',
+					'length' => '45',
+					'not null' => TRUE,
+					'default' => '',
+				),
+				'role' => array(
+					'type' => 'varchar',
+					'length' => '45',
+					'not null' => TRUE,
+					'default' => '',
+				),
+				'client_account_id' => array(
+					'type' => 'int',
+					'unsigned' => TRUE,
+					'not null' => TRUE,
+				),	
+			),
+			'indexes' => array(
+				'client_account_id' => array('client_account_id'),
+			),
+			'primary key' => array('id'),
+
+	);
+	return $schema;
+}
+
+ 
+      
+   
