@@ -1,0 +1,139 @@
+<?php
+/**
+ *
+ *  hook_menu()
+ */
+function acm_provision_menu() {
+	$items = array();
+	$items['client/info/list'] = array(
+		'title' => 'Client List',
+		'page callback' => 'client_information_list',
+		'access callback' => 'user_is_logged_in',
+		'type' => MENU_CALLBACK,
+	);
+	$items['client/info/%/view'] = array(
+		'title' => 'View Client',
+		'page callback' => 'view_clientlist',
+		'page arguments' => array(2),
+		'access callback' => 'user_is_logged_in',
+		'type' => MENU_CALLBACK,
+	);
+	$items['client/add'] = array(
+		'title' => 'Add Client',
+		'page callback' => 'client_information_formget',
+		'page arguments' => array(2),
+		'access callback' => 'user_is_logged_in',
+		'type' => MENU_CALLBACK,
+	);
+	return $items;
+}
+
+// All client information list
+function client_information_list(){
+    db_set_active('remote_db'); // remote database active now
+	$header = array(
+		array('data' => t('Client Id'), 'field' => 'title', 'sort' => 'asc'),
+		array('data' => t('User Name'), 'field' => 'id', 'sort' => 'asc'),
+		array('data' => t('Access Token'), 'field' => 'Code', ),
+		array('data' => t('Refresh Token'),'field' => 'test_score', ),	
+		array('data' => t('View')),
+	);
+	$Sql="SELECT ca.id, ca.client_id, ca.username, ca.access_token, ca.refresh_token FROM client_account ca";
+	
+	$count = "SELECT count(*) FROM client_account";	
+	$query = pager_query($Sql,5,0,$count);
+	while($client = db_fetch_object($query)){
+	   $data[] = array($client->client_id, $client->username, $client->access_token, $client->refresh_token, l('View', 'client/info/'.$client->id.'/view'));
+	}
+	$content .= theme('table', $header, $data);
+	$content .= theme('pager', 5);
+	db_set_active('default'); // back to local database 
+	return $content;
+}
+//single client details view
+function view_clientlist($id){
+     db_set_active('remote_db'); // remote database active now
+	$output ="<div></div>" ;	
+	$output .="<div class='title'><h3></h3></div>" ;	
+	$output .= "<table class='client_details' cellpadding='4' width='100%'>" ;
+	
+	$query="SELECT ca.id, ca.client_id, ca.username, ca.access_token, ca.refresh_token FROM client_account ca where ca.id=".$id;	
+	$client = db_fetch_object(db_query($query));
+	if($client->client_id){
+		$output.="<tr><td colspan='3'style='font-weight:bold;'>Client ID:</td><td>". $client->client_id."</td></tr>";
+	}
+	if($client->username){
+		$output.="<tr><td colspan='3'style='font-weight:bold;'>User Name:</td><td>".$client->username."</td></tr>";
+	}
+	if($client->access_token){
+		$output.="<tr><td colspan='3'style='font-weight:bold;'>Access Token:</td><td>".$client->access_token."</td></tr>";
+	}
+	if($client->refresh_token){
+		$output.="<tr><td colspan='3'style='font-weight:bold;'>Refresh Token Id:</td><td>".$client->refresh_token."</td></tr>";
+	}
+	$output.= '</table>';
+	db_set_active('default'); // back to local database 
+ return $output;
+}
+function client_information_formget(){
+	return drupal_get_form('client_information_form');
+}
+function client_information_form($form_id){
+	$form['username'] = array(
+		'#title' => t('Username'),
+		'#type' => 'textfield',
+		'#size' => 60,
+		'#maxlength' => 45,
+		'#required' => TRUE,  
+	);
+	$form['password'] = array(
+		'#title' => t('Password'),
+		'#type' => 'password',
+		'#size' => 60,
+		'#maxlength' => 45,
+		'#required' => TRUE,  		
+	);
+	$form['client_secret'] = array(
+		'#title' => t('Client Secret'),
+		'#type' => 'textfield',
+		'#size' => 60,
+		'#maxlength' => 45,
+		'#required' => TRUE,  
+	);
+	$form['client_id'] = array(
+		'#title' => t('Client ID'),
+		'#type' => 'textfield',
+		'#size' => 60,
+		'#maxlength' => 45,
+		'#required' => TRUE, 		
+	);
+	$form['access_token'] = array(
+		'#title' => t('Access Token'),
+		'#type' => 'textfield',
+		'#size' => 60,
+		'#maxlength' => 45,
+		'#required' => TRUE,    
+	);
+	$form['refresh_token'] = array(
+		'#title' => t('Refresh Token'),
+		'#type' => 'textfield',
+		'#size' => 60,
+		'#maxlength' => 45,
+		'#required' => TRUE,
+	);
+	$form['submit'] = array(
+		'#value' => 'Submit',
+		'#type' => 'submit',
+	);
+	return $form;
+}
+
+function client_information_form_submit($form_id, &$form_state){
+	 db_set_active('remote_db'); // remote database active now
+	
+	db_query("INSERT INTO {client_account} (username, password, client_secret, client_id, access_token, refresh_token) VALUES ('%s', '%s', '%s', '%s', '%s', '%s')", $form_state['values']['username'], $form_state['values']['password'], $form_state['values']['client_secret'], $form_state['values']['client_id'], $form_state['values']['access_token'], $form_state['values']['refresh_token']); 
+	
+	db_set_active('default'); // back to local database 
+	
+	$form_state['redirect'] = 'client/info/list';
+}
