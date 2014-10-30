@@ -31,22 +31,23 @@ function client_authorization_form(){
 		'#maxlength' => 128,
 		'#default_value' => $mail,
 		'#attributes' => array('readonly' => 'readonly'),
-		'#description' => t('Your existing email is used as your client id'),
+		'#description' => t('Your existing email is used as your client id')
 	);
 	$form['client_secret'] = array(
 		'#type' => 'password',
 		'#title' => t('Client secret'),
 		'#size' => 60,
-		'#maxlength' => 128,	
+		'#maxlength' => 128,
+		'#required' => TRUE
 	);
 	$form['user_id'] = array(
 		'#type' => 'hidden',
 		'#title' => t('User uid'),
-		'#default_value' => $uid,
+		'#default_value' => $uid
 	);
 	$form['submit'] = array(
 		'#type' => 'submit',
-		'#value' => t('Continue'),
+		'#value' => t('Continue')
 	);
 	return $form;
 }
