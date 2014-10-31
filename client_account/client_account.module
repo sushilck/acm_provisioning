@@ -1,0 +1,61 @@
+<?php
+/**
+ *
+ *  hook_menu()
+ */
+function client_account_menu() {
+	$items = array();
+	$items['client/authorization'] = array(
+		'title' => 'Authorize account screen',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('client_authorization_form'),
+		'access callback' => 'user_is_logged_in',
+		'type' => MENU_CALLBACK,
+	);
+	return $items;
+}
+
+function client_authorization_form(){
+    global $user;
+	$uid = $user->uid;
+	$mail = $user->mail;
+	$form['clientauth_desc'] = array(
+		'#type' => 'item',
+		'#title' => t('<h2>Request to authorize user email for access to Acadaman</h2>'),
+		'#description' => t('Before you begin to enjoy the benefits of Acadaman, we need to authorize you for access to all the goodies.'),
+	);
+	$form['client_id'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Client id'),
+		'#size' => 60,
+		'#maxlength' => 128,
+		'#default_value' => $mail,
+		'#attributes' => array('readonly' => 'readonly'),
+		'#description' => t('Your existing email is used as your client id')
+	);
+	$form['client_secret'] = array(
+		'#type' => 'password',
+		'#title' => t('Client secret'),
+		'#size' => 60,
+		'#maxlength' => 128,
+		'#required' => TRUE
+	);
+	$form['user_id'] = array(
+		'#type' => 'hidden',
+		'#title' => t('User uid'),
+		'#default_value' => $uid
+	);
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Continue')
+	);
+	return $form;
+}
+
+function client_authorization_form_validate($form, &$form_state){
+	
+}
+function client_authorization_form_submit($form, &$form_state){
+	$form_state['redirect'] ='user/'.$form_state['values']['user_id'].'/edit';
+}
+
