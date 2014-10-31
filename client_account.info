@@ -1,5 +1,0 @@
-name = Client account
-description = Client account.
-package = Custom
-core = 6.x
-version = "6.x"
