@@ -1,5 +1,0 @@
-name = Acm Provision 
-description = Client info access from remote db.
-package = Custom
-core = 6.x
-version = "6.x"
